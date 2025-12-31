@@ -238,7 +238,7 @@
     /********************************************
      * GOOGLE SHEETS BACKEND CONFIG
      ********************************************/
-    const GAS_URL = "YOUR_GAS_WEB_APP_URL_HERE";
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbyP_fGSXo0EeG8FhygM9cKGmaBROoBB8yBqehdUXkTjCbTtH3XcoRd33K4EZRbCNhGjog/exec";
 
     async function apiGet(action) {
       const url = `${GAS_URL}?action=${encodeURIComponent(action)}&t=${Date.now()}`;
