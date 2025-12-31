@@ -2,1390 +2,540 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>2027 Nigeria Election Poll (Gamified)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>2027 Nigeria Election Poll (Gamified) — Sheets Connected</title>
 
-  <link rel="icon" href="https://upload.wikimedia.org/wikipedia/commons/thumb/b/bc/Coat_of_arms_of_Nigeria.svg/1200px-Coat_of_arms_of_Nigeria.svg.png" type="image/x-icon">
-  <meta name="description" content="Vote for your preferred 2027 Nigerian presidential and vice-presidential combo. View charts, breakdowns, and loyalty leaderboards in this gamified poll experience." />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet"/>
 
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    :root { --bg:#0b1220; --card:#101a30; --text:#eaf0ff; --muted:#9fb0d0; --line:#1d2b4c; --good:#21c07a; --bad:#ff5b6b; }
+    body { margin:0; font-family:Montserrat,system-ui,-apple-system,Segoe UI,Roboto,Arial; background:linear-gradient(180deg,#070b14,#0b1220); color:var(--text); }
+    header { padding:18px 16px; border-bottom:1px solid var(--line); position:sticky; top:0; background:rgba(11,18,32,.9); backdrop-filter:blur(10px); z-index:10; }
+    header h1 { margin:0; font-size:16px; letter-spacing:.2px; }
+    header p { margin:6px 0 0; color:var(--muted); font-size:12px; }
 
-  <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
-  <script src="https://cdn.amcharts.com/lib/5/map.js"></script>
-  <script src="https://cdn.amcharts.com/lib/5/xy.js"></script>
-  <script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
-  <script src="https://cdn.amcharts.com/lib/5/geodata/nigeriaLow.js"></script>
-  <script src="https://cdn.amcharts.com/lib/5/percent.js"></script>
+    .wrap { max-width:1100px; margin:0 auto; padding:18px 16px 60px; }
+    .grid { display:grid; grid-template-columns: 1.1fr .9fr; gap:14px; }
+    @media (max-width: 980px){ .grid { grid-template-columns:1fr; } }
 
-  <!-- keep your styling -->
-  <link rel="stylesheet" href="https://kingamada.github.io/PollsFiles/style.css" crossorigin="anonymous">
+    .card { background:rgba(16,26,48,.9); border:1px solid var(--line); border-radius:14px; padding:14px; box-shadow: 0 10px 30px rgba(0,0,0,.25); }
+    .card h2 { margin:0 0 10px; font-size:14px; }
+    .row { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+    label { font-size:12px; color:var(--muted); display:block; margin-bottom:6px; }
+    input, select, textarea {
+      width:100%;
+      background:#0b152a;
+      border:1px solid #24385f;
+      color:var(--text);
+      padding:10px 10px;
+      border-radius:10px;
+      outline:none;
+      font-size:13px;
+    }
+    textarea { min-height:90px; resize:vertical; }
+    .field { flex: 1 1 200px; min-width:200px; }
+    .btn {
+      background:#1f3b76;
+      border:1px solid #2d4f93;
+      color:#fff;
+      padding:10px 12px;
+      border-radius:10px;
+      cursor:pointer;
+      font-weight:700;
+      font-size:13px;
+    }
+    .btn:active { transform:translateY(1px); }
+    .btn.good { background:#118a57; border-color:#22c07a; }
+    .btn.bad { background:#7a1a2a; border-color:#ff5b6b; }
+    .mini { font-size:12px; color:var(--muted); line-height:1.4; }
+    .status { font-size:12px; margin-top:10px; padding:10px; border-radius:10px; border:1px dashed #2a3e66; color:var(--muted); }
+    .status strong { color:var(--text); }
+    .pill { display:inline-block; padding:4px 8px; border-radius:999px; border:1px solid #2a3e66; color:var(--muted); font-size:11px; }
+
+    .divider { height:1px; background:var(--line); margin:12px 0; }
+    .kpi { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+    @media (max-width:680px){ .kpi { grid-template-columns:1fr; } }
+    .kpi .box { padding:10px; border-radius:12px; border:1px solid #24385f; background:#0a1327; }
+    .kpi .box .v { font-size:16px; font-weight:800; margin-top:6px; }
+  </style>
 </head>
 
 <body>
-  <div id="countdownTimer">Poll Ends in ...</div>
+<header>
+  <h1>2027 Nigeria Election Poll (Gamified) — Connected to Google Sheets</h1>
+  <p>Every action can be saved as an event. New fields automatically become new columns in your Sheet.</p>
+</header>
 
-  <button id="mobileMenuBtn" aria-label="Open Menu">
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <line x1="3" y1="12" x2="21" y2="12"></line>
-      <line x1="3" y1="6" x2="21" y2="6"></line>
-      <line x1="3" y1="18" x2="21" y2="18"></line>
-    </svg>
-  </button>
+<div class="wrap">
+  <div class="grid">
+    <div class="card">
+      <h2>Quick Vote Capture</h2>
 
-  <div id="mobileNavPanel">
-    <button class="menu-close-btn" aria-label="Close Menu">&times;</button>
-    <nav>
-      <ul>
-        <li><a href="#selectionSection">Select Candidates</a></li>
-        <li><a href="#voteSection">Vote</a></li>
-        <li><a href="#resultsSection">Results</a></li>
-        <li><a href="#popularitySection">Popularity</a></li>
-        <li><a href="#commentsSection">Comments</a></li>
-      </ul>
-    </nav>
-  </div>
-
-  <!-- keep your hidden tables if you want as fallback, but backend is now Google Sheets -->
-  <table id="candidateDataTable" style="display:none;"><thead><tr><th>Name</th><th>ImageURL</th><th>Religion</th><th>Age</th><th>Zone</th><th>Likes</th></tr></thead><tbody></tbody></table>
-  <table id="comboDataTable" style="display:none;"><thead><tr><th>President</th><th>VicePresident</th><th>Votes</th></tr></thead><tbody></tbody></table>
-  <table id="userDataTable" style="display:none;"><thead><tr><th>ID</th><th>Combo</th><th>ParentID</th><th>Name</th><th>Comment</th><th>Phone</th><th>State</th><th>City</th><th>Gender</th><th>Age</th></tr></thead><tbody></tbody></table>
-  <table id="loyalistDataTable" style="display:none;"><thead><tr><th>ReferralCode</th><th>LoyalistName</th><th>City</th><th>Combo</th><th>influencers</th><th>Donation</th><th>ComboImg1</th><th>ComboImg2</th></tr></thead><tbody></tbody></table>
-
-  <div class="header">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/bc/Coat_of_arms_of_Nigeria.svg/1200px-Coat_of_arms_of_Nigeria.svg.png" alt="Nigeria Coat of Arms"/>
-    <h1 class="main-heading">2027 Nigeria Election Permutation Poll</h1>
-    <p class="sub-heading">
-      Select your preferred President and Vice President, then cast your vote. Use a referral code if someone shared one with you!
-    </p>
-    <div class="divider"></div>
-  </div>
-
-  <div class="container">
-    <div class="selection-section" id="selectionSection">
-      <div class="selection-box" id="presidentBox">
-        <h2>President</h2>
-        <p class="section-subtitle">Select who should be the president</p>
-        <ul class="candidate-list" id="presidentList"></ul>
-      </div>
-
-      <div class="selection-box" id="vicePresidentBox">
-        <h2>Vice President</h2>
-        <p class="section-subtitle">Select who should be the VP</p>
-        <ul class="candidate-list" id="vicePresidentList"></ul>
-      </div>
-    </div>
-
-    <div class="vote-section" id="voteSection">
-      <p class="section-subtitle" style="width:100%; margin-top: -0.5rem;">Input required fields to be able to vote</p>
-
-      <div class="vote-form">
-        <input type="text" placeholder="Name (required)" id="voterName" />
-        <input type="tel" placeholder="Phone (required)" id="voterPhone" />
-
-        <select id="voterState">
-          <option disabled selected value="">State (required)</option>
-          <option>Abia</option><option>Adamawa</option><option>Akwa Ibom</option><option>Anambra</option><option>Bauchi</option><option>Bayelsa</option><option>Benue</option><option>Borno</option><option>Cross River</option><option>Delta</option><option>Ebonyi</option><option>Edo</option><option>Ekiti</option><option>Enugu</option><option>FCT Abuja</option><option>Gombe</option><option>Imo</option><option>Jigawa</option><option>Kaduna</option><option>Kano</option><option>Katsina</option><option>Kebbi</option><option>Kogi</option><option>Kwara</option><option>Lagos</option><option>Nasarawa</option><option>Niger</option><option>Ogun</option><option>Ondo</option><option>Osun</option><option>Oyo</option><option>Plateau</option><option>Rivers</option><option>Sokoto</option><option>Taraba</option><option>Yobe</option><option>Zamfara</option>
-        </select>
-
-        <select id="voterCity">
-          <option disabled selected value="">City (required)</option>
-          <option>Aba</option><option>Abakaliki</option><option>Abeokuta</option><option>Abuja</option><option>Ado Ekiti</option><option>Akure</option><option>Asaba</option><option>Awka</option><option>Bauchi</option><option>Benin City</option><option>Birnin Kebbi</option><option>Calabar</option><option>Damaturu</option><option>Daura</option><option>Dutse</option><option>Enugu</option><option>Gombe</option><option>Gusau</option><option>Ibadan</option><option>Ikeja</option><option>Ilorin</option><option>Jalingo</option><option>Jos</option><option>Kaduna</option><option>Kano</option><option>Katsina</option><option>Lafia</option><option>Lokoja</option><option>Maiduguri</option><option>Makurdi</option><option>Minna</option><option>Nsukka</option><option>Ogbomosho</option><option>Onitsha</option><option>Oshogbo</option><option>Owerri</option><option>Oyo</option><option>Port Harcourt</option><option>Sokoto</option><option>Umuahia</option><option>Uyo</option><option>Warri</option><option>Yenagoa</option><option>Yola</option><option>Zaria</option>
-        </select>
-
-        <select id="voterGender">
-          <option disabled selected value="">Gender (required)</option>
-          <option>Male</option><option>Female</option><option>Other</option>
-        </select>
-
-        <input type="number" placeholder="Age (required)" id="voterAge" />
-
-        <div style="display:flex; align-items:center; gap:0.3rem; flex-basis: 100%; justify-content: center;">
-          <label for="voterReferral">Referral Code:</label>
-          <input type="text" id="voterReferral" placeholder="(if any)" />
+      <div class="row">
+        <div class="field">
+          <label>Voter Name (optional)</label>
+          <input id="voterName" placeholder="e.g. Sarki" />
+        </div>
+        <div class="field">
+          <label>Phone (optional)</label>
+          <input id="voterPhone" placeholder="e.g. 080..." />
+        </div>
+        <div class="field">
+          <label>State</label>
+          <select id="state">
+            <option value="">Select State</option>
+          </select>
         </div>
       </div>
 
-      <button class="vote-button" id="voteBtn" disabled>
-        <div class="fill-overlay" id="buttonFill"></div>
-        <span class="vote-text">Vote</span>
-      </button>
-    </div>
-
-    <div class="legend">
-      Legend: NC, NE, NW, SW, SE, SS (North Central, North East, North West, South West, South East, South-South).
-    </div>
-
-    <div class="results-section" id="resultsSection">
-      <div class="chart" id="chart">
-        <h2>Voting Results</h2>
-        <p class="section-subtitle">This shows a chart of the leading combos</p>
-        <div id="chartBars"></div>
-
-        <div class="referral-info">
-          Want to become a <strong>Top Combo Influencer</strong> for your chosen combo?
-          Request your unique referral code! Share it with friends - every vote using your code boosts your ranking on the leaderboard.
-          <br><button id="getReferralCodeBtn">Become a Top Combo Influencer-Get Code</button>
+      <div class="row" style="margin-top:10px;">
+        <div class="field">
+          <label>Candidate</label>
+          <select id="candidate">
+            <option value="">Select Candidate</option>
+          </select>
         </div>
 
-        <h3 class="loyalist-heading">Top Combo Influencers</h3>
-        <div id="loyalistCombosContainer"></div>
+        <div class="field">
+          <label>Party</label>
+          <select id="party">
+            <option value="">Select Party</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Vote Weight (optional)</label>
+          <input id="weight" type="number" value="1" min="1" />
+        </div>
       </div>
 
-      <div class="voted-combos" id="votedCombosBox">
-        <h2>Voted Combinations</h2>
-        <p class="section-subtitle">Click a combo card to view/add comments</p>
-        <div class="combo-grid" id="comboGrid"></div>
+      <div class="row" style="margin-top:10px;">
+        <div class="field" style="flex:1 1 100%;">
+          <label>Note (optional)</label>
+          <input id="note" placeholder="Any small context..." />
+        </div>
+      </div>
 
-        <h3 class="map-heading">Most Voted Combo Per State</h3>
-        <p class="section-subtitle">Hover over a state to see its top combo</p>
-        <div id="nigeriaMap"></div>
+      <div class="row" style="margin-top:12px;">
+        <button class="btn good" id="btnVote">Save Vote</button>
+        <button class="btn" id="btnSpin">Simulate Spin Round</button>
+        <button class="btn bad" id="btnFlush">Flush Offline Queue</button>
+        <span class="pill" id="queuePill">Queue: 0</span>
+      </div>
+
+      <div class="status" id="statusBox">
+        <strong>Status:</strong> Ready.
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="mini">
+        This page posts to your Apps Script Web App. If a user is offline or the request fails,
+        data is queued and retried later.
       </div>
     </div>
 
-    <div class="extra-chart-container" id="popularitySection">
-      <h3>Popularity Breakdown</h3>
-      <p class="section-subtitle">Pie chart of the most voted combos</p>
-      <div id="popularityPie"></div>
-    </div>
-
-    <div class="combo-comment-section" id="commentsSection">
-      <h3 class="combo-comment-title" id="comboCommentTitle">Comments</h3>
-      <div class="combo-comment-form">
-        <input type="text" placeholder="Your Name" id="comboCommentName" />
-        <textarea rows="3" placeholder="Write your comment..." id="comboCommentText"></textarea>
-        <button class="combo-comment-btn" id="comboCommentPostBtn">Post Comment</button>
+    <div class="card">
+      <h2>Dashboard KPIs (Local)</h2>
+      <div class="kpi">
+        <div class="box">
+          <div class="mini">Local votes saved (this device)</div>
+          <div class="v" id="kVotes">0</div>
+        </div>
+        <div class="box">
+          <div class="mini">Local spin rounds</div>
+          <div class="v" id="kSpins">0</div>
+        </div>
+        <div class="box">
+          <div class="mini">Last event id</div>
+          <div class="v" id="kLast" style="font-size:12px; font-weight:700; word-break:break-all;">-</div>
+        </div>
       </div>
-      <div class="combo-comment-list" id="comboCommentList"></div>
-    </div>
 
-    <div style="text-align:center; margin-top:1.5rem;">
-      <button id="contactUsBtn">Have a question or want to add yourself?</button>
+      <div class="divider"></div>
+
+      <h2>State Result Update (Example)</h2>
+      <div class="row">
+        <div class="field">
+          <label>State</label>
+          <select id="state2">
+            <option value="">Select State</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Candidate</label>
+          <select id="candidate2">
+            <option value="">Select Candidate</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Votes (state total)</label>
+          <input id="stateVotes" type="number" value="0" min="0" />
+        </div>
+      </div>
+      <div class="row" style="margin-top:12px;">
+        <button class="btn" id="btnStateSave">Save State Result</button>
+      </div>
+
+      <div class="mini" style="margin-top:10px;">
+        You can call <b>saveStateResult(state, candidate, votes)</b> directly from your map click logic.
+      </div>
     </div>
   </div>
+</div>
 
-  <!-- CONTACT LIGHTBOX -->
-  <div class="lightbox-overlay" id="lightboxOverlay">
-    <div class="lightbox-content">
-      <span class="lightbox-close" id="lightboxClose">X</span>
-      <h2 style="text-align:center; font-size: 1.2rem;">Contact / Add Candidate</h2>
-      <p style="font-size:0.85rem; color:#666; margin-top:0.3rem; text-align:center;">Kindly fill out the form below.</p>
+<script>
+  /* -------------------- CONFIG -------------------- */
 
-      <form class="lightbox-form" id="lightboxForm">
-        <label for="contactFullName">Full Name (required)</label>
-        <input type="text" id="contactFullName" placeholder="Your Full Name" required />
-        <label for="contactPhone">Phone Number</label>
-        <input type="tel" id="contactPhone" placeholder="08012345678" required />
-        <label for="contactEmail">Email Address</label>
-        <input type="email" id="contactEmail" placeholder="example@email.com" required />
-        <label for="contactMessage">Your Question / Candidate Info</label>
-        <textarea id="contactMessage" rows="4" placeholder="Please type your request..."></textarea>
-        <button type="submit">Submit</button>
-      </form>
+  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxyQF5LLJO0EmWeF18SreySreID9XghpDij8qERxgyblubPF_9Jb-W0N4_BJa72vdNsHA/exec";
 
-      <div class="submit-message" id="lightboxSubmitMsg">Thanks! We will be in touch soon.</div>
-    </div>
-  </div>
+  // Local storage keys
+  const LS_QUEUE = "poll_offline_queue_v1";
+  const LS_KPI   = "poll_local_kpi_v1";
+  const LS_SESSION = "poll_session_id_v1";
 
-  <!-- REFERRAL LIGHTBOX -->
-  <div class="lightbox-overlay" id="referralLightbox">
-    <div class="lightbox-content">
-      <span class="lightbox-close" id="referralLightboxClose">X</span>
-      <h2 style="text-align:center; font-size: 1.2rem;">Request Referral Code</h2>
-      <p style="font-size:0.85rem; color:#666; margin-top:0.3rem; text-align:center;">
-        Fill out the form to request your unique code. Share it to climb the leaderboard!
-        <br><strong>The fee to get a code and be part of this leadership poll is non-refundable N1,000,000.</strong>
-      </p>
+  /* -------------------- SAMPLE DATA (edit freely) -------------------- */
 
-      <form class="lightbox-form" id="referralRequestForm">
-        <label for="referralName">Your Name (required)</label>
-        <input type="text" id="referralName" placeholder="Your Full Name" required />
-        <label for="referralContact">Phone or Email (required)</label>
-        <input type="text" id="referralContact" placeholder="Phone or Email for code delivery" required />
-        <button type="submit">Request Code</button>
-      </form>
+  // You can replace these with your real candidate list, parties, etc.
+  const CANDIDATES = [
+    { id: "cand_001", name: "Candidate A" },
+    { id: "cand_002", name: "Candidate B" },
+    { id: "cand_003", name: "Candidate C" }
+  ];
 
-      <div class="submit-message" id="referralSubmitMsg">
-        Thanks! Your request has been submitted. We'll process it shortly.
-      </div>
-    </div>
-  </div>
+  const PARTIES = [
+    { id: "pty_001", code: "AAA", name: "Alpha Alliance" },
+    { id: "pty_002", code: "BBB", name: "Blue Bloc" },
+    { id: "pty_003", code: "CCC", name: "Citizen Coalition" }
+  ];
 
-  <!-- WIKI LIGHTBOX -->
-  <div class="wiki-lightbox-overlay" id="wikiLightbox">
-    <div class="wiki-lightbox-content">
-      <span class="wiki-lightbox-close" id="wikiLightboxClose">X</span>
-      <iframe id="wikiIframe" src="about:blank" title="Wikipedia Information"></iframe>
-    </div>
-  </div>
+  // Full Nigeria states list
+  const STATES = [
+    "Abia","Adamawa","Akwa Ibom","Anambra","Bauchi","Bayelsa","Benue","Borno","Cross River","Delta","Ebonyi","Edo",
+    "Ekiti","Enugu","FCT","Gombe","Imo","Jigawa","Kaduna","Kano","Katsina","Kebbi","Kogi","Kwara","Lagos","Nasarawa",
+    "Niger","Ogun","Ondo","Osun","Oyo","Plateau","Rivers","Sokoto","Taraba","Yobe","Zamfara"
+  ];
 
-  <footer>
-    <p>All rights reserved © 2027 Nigeria Official Polling Commission</p>
-    <p>Site secured by:</p>
-    <div class="security-badges">
-      <div class="security-badge">
-        <img src="https://www.usatoday.com/gcdn/-mm-/3e1efaec2a9d17b3b2b39a2d93df1d1f2f03a3fd/c=0-222-1978-2860/local/-/media/USATODAY/USATODAY/2014/08/18/1408384466000-Norton-Vert-RGB-300dpi.jpg" alt="Norton Security"/>
-      </div>
-      <div class="security-badge">
-        <img src="https://sm.pcmag.com/t/pcmag_me/review/m/mcafee-tot/mcafee-total-protection-for-mac_vydx.1920.jpg" alt="McAfee Security"/>
-      </div>
-      <div class="security-badge">
-        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQs8XdulVX0YZdYqSi38iAXF2ok8fhNqGU33Q&s" alt="Thawte SSL"/>
-      </div>
-    </div>
-  </footer>
+  /* -------------------- UTILITIES -------------------- */
 
-  <script>
-    /********************************************
-     * GOOGLE SHEETS BACKEND CONFIG
-     ********************************************/
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbyP_fGSXo0EeG8FhygM9cKGmaBROoBB8yBqehdUXkTjCbTtH3XcoRd33K4EZRbCNhGjog/exec";
+  function uid(prefix="evt") {
+    return `${prefix}_${Date.now()}_${Math.random().toString(16).slice(2)}`;
+  }
 
-    async function apiGet(action) {
-      const url = `${GAS_URL}?action=${encodeURIComponent(action)}&t=${Date.now()}`;
-      const res = await fetch(url);
-      return res.json();
+  function nowISO() {
+    return new Date().toISOString();
+  }
+
+  function getSessionId() {
+    let s = localStorage.getItem(LS_SESSION);
+    if (!s) {
+      s = uid("sess");
+      localStorage.setItem(LS_SESSION, s);
     }
+    return s;
+  }
 
-    async function apiPost(action, payload) {
-      // Use text/plain to avoid preflight issues in many environments
-      const res = await fetch(GAS_URL, {
-        method: "POST",
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify({ action, payload })
-      });
-      return res.json();
-    }
+  function getKpi() {
+    try { return JSON.parse(localStorage.getItem(LS_KPI)) || { votes:0, spins:0, last:"-" }; }
+    catch(e){ return { votes:0, spins:0, last:"-" }; }
+  }
 
-    /********************************************
-     * WIKIPEDIA LIGHTBOX LOGIC
-     ********************************************/
-    const wikiLinks = {
-      "Sanusi Lamido":        "https://en.wikipedia.org/wiki/Sanusi_Lamido_Sanusi",
-      "Goodluck Jonathan":    "https://en.wikipedia.org/wiki/Goodluck_Jonathan",
-      "Aminu Tambuwal":       "https://en.wikipedia.org/wiki/Aminu_Tambuwal",
-      "Rotimi Amaechi":       "https://en.wikipedia.org/wiki/Rotimi_Amaechi",
-      "Bukola Saraki":        "https://en.wikipedia.org/wiki/Bukola_Saraki",
-      "Godswill Akpabio":     "https://en.wikipedia.org/wiki/Godswill_Akpabio",
-      "Nyesom Wike":          "https://en.wikipedia.org/wiki/Nyesom_Wike",
-      "Yemi Osinbajo":        "https://en.wikipedia.org/wiki/Yemi_Osinbajo",
-      "Yakubu Dogara":        "https://en.wikipedia.org/wiki/Yakubu_Dogara",
-      "Atiku Abubakar":       "https://en.wikipedia.org/wiki/Atiku_Abubakar",
-      "Rabiu Kwankwaso":      "https://en.wikipedia.org/wiki/Rabiu_Kwankwaso",
-      "Peter Obi":            "https://en.wikipedia.org/wiki/Peter_Obi",
-      "Nasir El-Rufai":       "https://en.wikipedia.org/wiki/Nasir_El-Rufai",
-      "Kashim Shettima":      "https://en.wikipedia.org/wiki/Kashim_Shettima",
-      "Bola Tinubu":          "https://en.wikipedia.org/wiki/Bola_Tinubu"
+  function setKpi(kpi) {
+    localStorage.setItem(LS_KPI, JSON.stringify(kpi));
+    renderKpi();
+  }
+
+  function renderKpi() {
+    const k = getKpi();
+    document.getElementById("kVotes").textContent = k.votes || 0;
+    document.getElementById("kSpins").textContent = k.spins || 0;
+    document.getElementById("kLast").textContent  = k.last || "-";
+  }
+
+  function setStatus(msg, ok=true) {
+    const box = document.getElementById("statusBox");
+    box.innerHTML = `<strong>Status:</strong> ${msg}`;
+    box.style.borderColor = ok ? "#2a3e66" : "#7a1a2a";
+    box.style.color = ok ? "var(--muted)" : "var(--bad)";
+  }
+
+  function getQueue() {
+    try { return JSON.parse(localStorage.getItem(LS_QUEUE)) || []; }
+    catch(e){ return []; }
+  }
+
+  function setQueue(q) {
+    localStorage.setItem(LS_QUEUE, JSON.stringify(q));
+    document.getElementById("queuePill").textContent = `Queue: ${q.length}`;
+  }
+
+  function queueEvent(payload) {
+    const q = getQueue();
+    q.push(payload);
+    setQueue(q);
+  }
+
+  function isOnline() {
+    return navigator.onLine !== false;
+  }
+
+  /* -------------------- CORE: SEND TO SHEETS -------------------- */
+  /**
+   * Sends event(s) to your Apps Script.
+   * - type becomes the sheet tab name
+   * - data can be object or array of objects
+   * Robustness:
+   * - queues on failure
+   * - attempts flush on regain connectivity
+   */
+  async function sendToSheets(type, data, opts = {}) {
+    const payload = {
+      type: type || "RawEvents",
+      data,
+      meta: {
+        ts: nowISO(),
+        event_id: uid("evt"),
+        session_id: getSessionId(),
+        user_agent: navigator.userAgent,
+        page: location.href,
+        referrer: document.referrer || "",
+        ip_hint: "", // browser can't read real IP; keep blank or pass your own if you have it
+      }
     };
 
-    const wikiLightbox = document.getElementById('wikiLightbox');
-    const wikiIframe   = document.getElementById('wikiIframe');
-    const wikiCloseBtn = document.getElementById('wikiLightboxClose');
+    // Merge meta into each record so it becomes columns
+    payload.data = normalizeRecords(payload.data).map(r => ({ ...payload.meta, ...r }));
 
-    function showWikiLightbox(candidateName) {
-      let link = wikiLinks[candidateName] || "about:blank";
-      wikiIframe.src = link;
-      wikiLightbox.style.display = 'flex';
+    const doQueueOnly = opts.queueOnly === true;
+
+    if (doQueueOnly || !isOnline()) {
+      queueEvent(payload);
+      setStatus(`Offline. Queued event: ${payload.meta.event_id}`, false);
+      bumpLast(payload.meta.event_id);
+      return { queued: true, event_id: payload.meta.event_id };
     }
 
-    function closeWikiLightbox() {
-      wikiLightbox.style.display = 'none';
-      wikiIframe.src = "about:blank";
-    }
-
-    wikiLightbox.addEventListener("click", (event) => { if (event.target === wikiLightbox) closeWikiLightbox(); });
-    wikiCloseBtn.addEventListener('click', closeWikiLightbox);
-
-    /********************************************
-     * GLOBALS
-     ********************************************/
-    let candidates       = [];
-    let candidateImages  = {};
-    let candidateDetails = {};
-    let candidateLikes   = {};
-    let votesData        = {};
-    let comboComments    = {};
-    let loyalists        = {};
-    let mapStatesTop     = {}; // state -> {combo, count}
-
-    let selectedPresident = null;
-    let selectedVP        = null;
-    let currentCombo      = null;
-
-    // DOM references
-    const presidentListEl = document.getElementById('presidentList');
-    const vicePresidentListEl = document.getElementById('vicePresidentList');
-    const voteBtn = document.getElementById('voteBtn');
-    const buttonFillEl = document.getElementById('buttonFill');
-    const chartBarsEl = document.getElementById('chartBars');
-    const loyalistCombosEl = document.getElementById('loyalistCombosContainer');
-    const comboGridEl = document.getElementById('comboGrid');
-
-    const voterNameEl = document.getElementById('voterName');
-    const voterPhoneEl = document.getElementById('voterPhone');
-    const voterStateEl = document.getElementById('voterState');
-    const voterCityEl = document.getElementById('voterCity');
-    const voterGenderEl = document.getElementById('voterGender');
-    const voterAgeEl = document.getElementById('voterAge');
-    const voterReferralEl = document.getElementById('voterReferral');
-
-    const comboCommentTitle = document.getElementById('comboCommentTitle');
-    const comboCommentName = document.getElementById('comboCommentName');
-    const comboCommentText = document.getElementById('comboCommentText');
-    const comboCommentPostBtn = document.getElementById('comboCommentPostBtn');
-    const comboCommentListEl = document.getElementById('comboCommentList');
-
-    const contactUsBtn = document.getElementById('contactUsBtn');
-    const lightboxOverlay = document.getElementById('lightboxOverlay');
-    const lightboxClose = document.getElementById('lightboxClose');
-    const lightboxForm = document.getElementById('lightboxForm');
-    const contactFullNameEl = document.getElementById('contactFullName');
-    const contactPhoneEl = document.getElementById('contactPhone');
-    const contactEmailEl = document.getElementById('contactEmail');
-    const contactMessageEl = document.getElementById('contactMessage');
-    const lightboxSubmitMsg = document.getElementById('lightboxSubmitMsg');
-
-    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-    const mobileNavPanel = document.getElementById('mobileNavPanel');
-    const mobileNavCloseBtn = mobileNavPanel.querySelector('.menu-close-btn');
-    const mobileNavLinks = mobileNavPanel.querySelectorAll('nav a');
-
-    const getReferralCodeBtn = document.getElementById('getReferralCodeBtn');
-    const referralLightbox = document.getElementById('referralLightbox');
-    const referralLightboxClose = document.getElementById('referralLightboxClose');
-    const referralRequestForm = document.getElementById('referralRequestForm');
-    const referralNameEl = document.getElementById('referralName');
-    const referralContactEl = document.getElementById('referralContact');
-    const referralSubmitMsg = document.getElementById('referralSubmitMsg');
-
-    // amCharts globals
-    let mapChart;
-    let polygonSeries;
-    let pieRoot;
-
-    /********************************************
-     * COUNTDOWN TIMER
-     ********************************************/
-    const countdownEl = document.getElementById('countdownTimer');
-    const endMs = Date.now() + (3 * 24 * 60 * 60 + 2 * 60 * 60 + 3 * 60 + 45) * 1000;
-
-    function updateCountdown() {
-      const diff = endMs - Date.now();
-      if (diff <= 0) {
-        countdownEl.textContent = "Poll Ended!";
-        clearInterval(countdownInterval);
-        return;
-      }
-      let s = Math.floor(diff / 1000);
-      let d = Math.floor(s / 86400); s %= 86400;
-      let h = Math.floor(s / 3600); s %= 3600;
-      let m = Math.floor(s / 60); s %= 60;
-      countdownEl.textContent = `Poll Ends: ${d}d ${h}h ${m}m ${s}s`;
-    }
-    const countdownInterval = setInterval(updateCountdown, 1000);
-    updateCountdown();
-
-    /********************************************
-     * INPUT VALIDATION & BASIC UI LISTENERS
-     ********************************************/
-    voterPhoneEl.addEventListener('input', () => {
-      voterPhoneEl.value = voterPhoneEl.value.replace(/\D/g, '').slice(0, 11);
-      updateProgress();
-    });
-    voterAgeEl.addEventListener('input', () => {
-      voterAgeEl.value = voterAgeEl.value.replace(/\D/g, '');
-      updateProgress();
-    });
-    contactPhoneEl.addEventListener('input', () => {
-      contactPhoneEl.value = contactPhoneEl.value.replace(/\D/g, '').slice(0, 11);
-    });
-
-    voterNameEl.addEventListener('input', updateProgress);
-    voterStateEl.addEventListener('change', updateProgress);
-    voterCityEl.addEventListener('change', updateProgress);
-    voterGenderEl.addEventListener('change', updateProgress);
-
-    if (contactUsBtn) {
-      contactUsBtn.addEventListener('click', () => { lightboxOverlay.style.display = 'flex'; });
-    }
-    if (lightboxClose) {
-      lightboxClose.addEventListener('click', () => { lightboxOverlay.style.display = 'none'; });
-    }
-    lightboxOverlay.addEventListener('click', (e) => { if (e.target === lightboxOverlay) lightboxOverlay.style.display = 'none'; });
-
-    // Mobile menu
-    mobileMenuBtn.addEventListener('click', () => mobileNavPanel.classList.add('active'));
-    mobileNavCloseBtn.addEventListener('click', () => mobileNavPanel.classList.remove('active'));
-    mobileNavLinks.forEach(link => {
-      link.addEventListener('click', (e) => {
-        e.preventDefault();
-        const targetId = link.getAttribute('href');
-        const targetElement = document.querySelector(targetId);
-        if (targetElement) targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        mobileNavPanel.classList.remove('active');
-      });
-    });
-
-    // Referral lightbox
-    getReferralCodeBtn.addEventListener('click', () => { referralLightbox.style.display = 'flex'; });
-    referralLightboxClose.addEventListener('click', () => {
-      referralLightbox.style.display = 'none';
-      referralSubmitMsg.style.display = 'none';
-      referralRequestForm.style.display = 'flex';
-    });
-    referralLightbox.addEventListener('click', (e) => {
-      if (e.target === referralLightbox) {
-        referralLightbox.style.display = 'none';
-        referralSubmitMsg.style.display = 'none';
-        referralRequestForm.style.display = 'flex';
-      }
-    });
-
-    /********************************************
-     * HELPERS
-     ********************************************/
-    function formatNumber(num) {
-      num = Number(num || 0);
-      if (num >= 1000000) return (num / 1000000).toFixed(1).replace(/\.0$/, "") + "M";
-      if (num >= 1000) return (num / 1000).toFixed(1).replace(/\.0$/, "") + "K";
-      return String(num);
-    }
-
-    function imageError(imgElement) {
-      imgElement.onerror = null;
-      imgElement.src = 'https://placehold.co/80x80/cccccc/ffffff?text=N/A';
-    }
-
-    function updateProgress() {
-      let steps = 8;
-      let done = 0;
-      if (selectedPresident) done++;
-      if (selectedVP) done++;
-      if (voterNameEl.value.trim()) done++;
-      if (voterPhoneEl.value.length === 11 && voterPhoneEl.value.startsWith('0')) done++;
-      if (voterStateEl.value) done++;
-      if (voterCityEl.value) done++;
-      if (voterGenderEl.value) done++;
-      if (voterAgeEl.value.trim()) done++;
-
-      let ratio = (done / steps) * 100;
-      buttonFillEl.style.width = ratio + "%";
-
-      if (done === steps) {
-        voteBtn.disabled = false;
-        voteBtn.classList.add('bounce');
-      } else {
-        voteBtn.disabled = true;
-        voteBtn.classList.remove('bounce');
-      }
-    }
-
-    /********************************************
-     * LOAD DATA FROM GOOGLE SHEETS
-     ********************************************/
-    async function loadFromBackend() {
-      const res = await apiGet("getElectionData");
-      if (!res || !res.ok) {
-        alert("Backend error: " + (res && res.error ? res.error : "Unknown"));
-        return;
-      }
-
-      const data = res.data || {};
-
-      // Candidates
-      candidates = [];
-      candidateImages = {};
-      candidateDetails = {};
-      candidateLikes = {};
-
-      (data.candidates || []).forEach(c => {
-        if (!c || !c.name) return;
-        candidates.push(c.name);
-        candidateImages[c.name] = c.imageUrl || 'https://placehold.co/80x80/cccccc/ffffff?text=N/A';
-        candidateDetails[c.name] = { age: c.age || '?', zone: c.zone || '?' };
-        candidateLikes[c.name] = Number(c.likes || 0);
+    // Try normal fetch first. If CORS blocks, fallback to no-cors fire-and-forget.
+    try {
+      const res = await fetch(APPS_SCRIPT_URL, {
+        method: "POST",
+        // Use text/plain to avoid preflight in most cases
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payload)
       });
 
-      // Combos totals
-      votesData = {};
-      (data.combos || []).forEach(c => {
-        if (!c || !c.president || !c.vicePresident) return;
-        const key = `${c.president} & ${c.vicePresident}`;
-        votesData[key] = Number(c.totalVotes || 0);
-
-        // keep images up to date if backend included
-        if (c.presidentImageUrl) candidateImages[c.president] = c.presidentImageUrl;
-        if (c.vicePresidentImageUrl) candidateImages[c.vicePresident] = c.vicePresidentImageUrl;
-      });
-
-      // Loyalists
-      loyalists = {};
-      (data.loyalists || []).forEach(l => {
-        if (!l || !l.referralCode) return;
-        loyalists[String(l.referralCode).toUpperCase()] = {
-          loyalistName: l.loyalistName || "",
-          city: l.city || "",
-          combo: l.combo || "",
-          supporters: Number(l.supporters || 0),
-          donation: Number(l.donation || 0),
-          comboImg1: l.comboImg1 || 'https://placehold.co/50x50/cccccc/ffffff?text=N/A',
-          comboImg2: l.comboImg2 || 'https://placehold.co/50x50/cccccc/ffffff?text=N/A'
-        };
-      });
-
-      // Comments
-      comboComments = {};
-      const allComments = [];
-      (data.users || []).forEach(u => {
-        if (!u || !u._id || !u.combo) return;
-        allComments.push({
-          id: String(u._id),
-          comboKey: u.combo,
-          parentID: u.parentId || 0,
-          name: u.name || "Anonymous",
-          text: u.comment || "",
-          replies: []
-        });
-      });
-
-      // Build hierarchy
-      const byId = {};
-      allComments.forEach(c => byId[c.id] = c);
-      allComments.forEach(c => {
-        if (c.parentID && c.parentID !== 0 && byId[c.parentID]) {
-          byId[c.parentID].replies.push(c);
-        }
-      });
-      allComments.forEach(c => {
-        if (!c.parentID || c.parentID === 0) {
-          if (!comboComments[c.comboKey]) comboComments[c.comboKey] = [];
-          comboComments[c.comboKey].push(c);
-        }
-      });
-
-      // Map state top combos
-      mapStatesTop = data.mapStatesTop || {};
-
-      // Render UI
-      populateCandidateList(presidentListEl, candidates, true);
-      populateCandidateList(vicePresidentListEl, candidates, false);
-      renderChart();
-      renderComboGrid();
-      renderComboLoyalists();
-      initMap();
-      renderPieChart();
-      updateProgress();
-    }
-
-    /********************************************
-     * UI RENDERING
-     ********************************************/
-    function populateCandidateList(listEl, candidatesArray, isPresidentList) {
-      listEl.innerHTML = '';
-
-      candidatesArray.forEach(candidateName => {
-        const li = document.createElement('li');
-        li.className = 'candidate-item';
-        li.dataset.candidateName = candidateName;
-
-        const img = document.createElement('img');
-        img.className = 'candidate-photo';
-        img.src = candidateImages[candidateName] || 'https://placehold.co/80x80/cccccc/ffffff?text=N/A';
-        img.alt = candidateName;
-        img.onerror = () => imageError(img);
-
-        const nameDiv = document.createElement('div');
-        nameDiv.className = 'candidate-name';
-        nameDiv.textContent = candidateName;
-
-        const details = candidateDetails[candidateName] || { age: '?', zone: '?' };
-        const infoDiv = document.createElement('div');
-        infoDiv.className = 'candidate-details';
-        infoDiv.textContent = `${details.age} - ${details.zone}`;
-
-        const likeDiv = document.createElement('div');
-        likeDiv.className = 'like-container';
-
-        const likeBtn = document.createElement('button');
-        likeBtn.className = 'like-btn';
-        likeBtn.innerHTML = '♥';
-
-        const likeCountSpan = document.createElement('span');
-        likeCountSpan.className = 'like-count';
-        likeCountSpan.textContent = formatNumber(candidateLikes[candidateName] || 0);
-
-        likeBtn.addEventListener('click', async (event) => {
-          event.stopPropagation();
-
-          // Optimistic UI
-          candidateLikes[candidateName] = (candidateLikes[candidateName] || 0) + 1;
-          updateCandidateLikesUI(candidateName);
-
-          likeBtn.disabled = true;
-          const r = await apiPost("recordLike", { candidateName });
-
-          if (!r || !r.ok) {
-            // revert if failed
-            candidateLikes[candidateName] = Math.max(0, (candidateLikes[candidateName] || 1) - 1);
-            updateCandidateLikesUI(candidateName);
-            alert("Like failed: " + (r && r.error ? r.error : "Unknown"));
-          }
-          setTimeout(() => { likeBtn.disabled = false; }, 700);
-        });
-
-        likeDiv.appendChild(likeBtn);
-        likeDiv.appendChild(likeCountSpan);
-
-        li.addEventListener('click', () => {
-          if (isPresidentList) {
-            if (selectedPresident !== candidateName) {
-              selectedPresident = candidateName;
-              highlightSelected(presidentListEl, candidateName);
-              showWikiLightbox(candidateName);
-            }
-          } else {
-            if (selectedVP !== candidateName) {
-              selectedVP = candidateName;
-              highlightSelected(vicePresidentListEl, candidateName);
-              showWikiLightbox(candidateName);
-            }
-          }
-          updateProgress();
-        });
-
-        li.appendChild(img);
-        li.appendChild(nameDiv);
-        li.appendChild(infoDiv);
-        li.appendChild(likeDiv);
-        listEl.appendChild(li);
-      });
-    }
-
-    function highlightSelected(listEl, selectedName) {
-      const items = listEl.querySelectorAll('.candidate-item');
-      items.forEach(item => {
-        if (item.dataset.candidateName === selectedName) item.classList.add('selected');
-        else item.classList.remove('selected');
-      });
-    }
-
-    function updateCandidateLikesUI(candidateName) {
-      const currentLikes = candidateLikes[candidateName] || 0;
-      const formatted = formatNumber(currentLikes);
-      document.querySelectorAll(`.candidate-item[data-candidate-name="${candidateName}"] .like-count`)
-        .forEach(span => span.textContent = formatted);
-    }
-
-    /********************************************
-     * VOTING (Google Sheets)
-     ********************************************/
-    voteBtn.addEventListener('click', async () => {
-      if (voteBtn.disabled) return;
-
-      if (!selectedPresident || !selectedVP) { alert("Please select both a President and a Vice President."); return; }
-      if (selectedPresident === selectedVP) { alert("President and Vice President cannot be the same person."); return; }
-
-      const name = voterNameEl.value.trim();
-      const phone = voterPhoneEl.value.trim();
-      const state = voterStateEl.value;
-      const city = voterCityEl.value;
-      const gender = voterGenderEl.value;
-      const age = voterAgeEl.value.trim();
-      if (!name || phone.length !== 11 || !phone.startsWith('0') || !state || !city || !gender || !age) {
-        alert("Please ensure all voter information fields are filled correctly.");
-        return;
-      }
-
-      voteBtn.disabled = true;
-      const originalText = voteBtn.querySelector('.vote-text').textContent;
-      voteBtn.querySelector('.vote-text').textContent = "Voting...";
-      voteBtn.classList.remove('bounce');
-
-      const comboKey = `${selectedPresident} & ${selectedVP}`;
-      const typedReferral = (voterReferralEl.value || "").trim().toUpperCase();
-
-      // optimistic UI
-      votesData[comboKey] = (votesData[comboKey] || 0) + 1;
-      renderChart();
-      renderComboGrid();
-      renderComboLoyalists();
-      renderPieChart();
-
-      const payload = {
-        name, phone, state, city, gender,
-        age: parseInt(age, 10) || 0,
-        combo: comboKey,
-        referralCodeUsed: typedReferral || "",
-        userAgent: navigator.userAgent
-      };
-
-      const r = await apiPost("recordVote", payload);
-
-      if (!r || !r.ok) {
-        // revert optimistic count
-        votesData[comboKey] = Math.max(0, (votesData[comboKey] || 1) - 1);
-        renderChart();
-        renderComboGrid();
-        renderComboLoyalists();
-        renderPieChart();
-
-        alert("Vote failed: " + (r && r.error ? r.error : "Unknown"));
-      } else {
-        alert(`Vote submitted for ${comboKey}!`);
-        voterReferralEl.value = "";
-        // refresh from backend for accurate map/leaderboard/comments totals
-        await loadFromBackend();
-      }
-
-      setTimeout(() => {
-        voteBtn.disabled = false;
-        voteBtn.querySelector('.vote-text').textContent = originalText;
-        updateProgress();
-      }, 1200);
-    });
-
-    /********************************************
-     * BAR CHART
-     ********************************************/
-    function renderChart() {
-      chartBarsEl.innerHTML = '';
-      const sorted = Object.entries(votesData).sort(([,a],[,b]) => b - a);
-      if (!sorted.length) { chartBarsEl.innerHTML = "<p>No votes recorded yet.</p>"; return; }
-      const maxVotes = sorted[0][1] || 1;
-
-      sorted.forEach(([combo, count]) => {
-        const row = document.createElement('div');
-        row.className = 'chart-bar';
-
-        const labelDiv = document.createElement('div');
-        labelDiv.className = 'bar-label';
-        labelDiv.textContent = combo;
-        labelDiv.title = `${combo} (${formatNumber(count)} votes)`;
-
-        const countSpan = document.createElement('span');
-        countSpan.className = 'vote-count-label';
-        countSpan.textContent = ` (${formatNumber(count)})`;
-        labelDiv.appendChild(countSpan);
-
-        const barContainer = document.createElement('div');
-        barContainer.className = 'bar-container';
-
-        const barFill = document.createElement('div');
-        barFill.className = 'bar-fill';
-        barFill.style.width = `${(count / maxVotes) * 100}%`;
-
-        barContainer.appendChild(barFill);
-        row.appendChild(labelDiv);
-        row.appendChild(barContainer);
-        chartBarsEl.appendChild(row);
-      });
-    }
-
-    /********************************************
-     * COMBO GRID
-     ********************************************/
-    function renderComboGrid() {
-      comboGridEl.innerHTML = '';
-      const sorted = Object.entries(votesData).sort(([,a],[,b]) => b - a);
-      if (!sorted.length) { comboGridEl.innerHTML = "<p>No combinations voted for yet.</p>"; return; }
-
-      sorted.forEach(([combo, count]) => {
-        const card = document.createElement('div');
-        card.className = 'combo-card';
-        card.dataset.comboKey = combo;
-
-        const shareBtn = document.createElement('button');
-        shareBtn.className = 'share-btn';
-        shareBtn.innerHTML = '🔗';
-        shareBtn.title = `Share ${combo}`;
-        shareBtn.addEventListener('click', (event) => {
-          event.stopPropagation();
-          const shareText = `Check out the ${combo} combo in the 2027 Nigeria Election Poll! Vote here: ${window.location.href}`;
-          if (navigator.share) {
-            navigator.share({ title: 'Nigeria Election Poll Combo', text: shareText }).catch(()=>{});
-          } else {
-            navigator.clipboard.writeText(shareText)
-              .then(() => alert(`Sharing info for ${combo} copied to clipboard!`))
-              .catch(() => alert('Failed to copy sharing info.'));
-          }
-        });
-        card.appendChild(shareBtn);
-
-        const topDiv = document.createElement('div');
-        topDiv.className = 'combo-top';
-
-        const [presName, vpName] = combo.split(" & ");
-        const imgPres = document.createElement('img');
-        imgPres.className = 'combo-img';
-        imgPres.src = candidateImages[presName] || 'https://placehold.co/55x55/cccccc/ffffff?text=N/A';
-        imgPres.onerror = () => imageError(imgPres);
-
-        const imgVP = document.createElement('img');
-        imgVP.className = 'combo-img';
-        imgVP.src = candidateImages[vpName] || 'https://placehold.co/55x55/cccccc/ffffff?text=N/A';
-        imgVP.onerror = () => imageError(imgVP);
-
-        topDiv.appendChild(imgPres);
-        topDiv.appendChild(imgVP);
-        card.appendChild(topDiv);
-
-        const titleDiv = document.createElement('div');
-        titleDiv.className = 'combo-title';
-        titleDiv.textContent = combo;
-        card.appendChild(titleDiv);
-
-        const statsDiv = document.createElement('div');
-        statsDiv.className = 'combo-stats';
-
-        const voteSpan = document.createElement('span');
-        voteSpan.className = 'vote-heart';
-        voteSpan.innerHTML = `♥ ${formatNumber(count)}`;
-        statsDiv.appendChild(voteSpan);
-
-        const commentsArray = comboComments[combo] || [];
-        let totalComments = 0;
-        const countCommentsRecursive = (arr) => {
-          arr.forEach(c => {
-            totalComments++;
-            if (c.replies && c.replies.length) countCommentsRecursive(c.replies);
-          });
-        };
-        countCommentsRecursive(commentsArray);
-
-        const commentSpan = document.createElement('span');
-        commentSpan.className = 'comment-icon';
-        commentSpan.innerHTML = `💬 ${formatNumber(totalComments)}`;
-        statsDiv.appendChild(commentSpan);
-
-        card.appendChild(statsDiv);
-        card.addEventListener('click', () => openComboComments(combo));
-        comboGridEl.appendChild(card);
-      });
-    }
-
-    /********************************************
-     * LOYALISTS RENDER
-     ********************************************/
-    function renderComboLoyalists() {
-      loyalistCombosEl.innerHTML = '';
-
-      const comboMap = {};
-      Object.entries(loyalists).forEach(([refCode, loyData]) => {
-        const comboName = loyData.combo;
-        if (!comboName) return;
-        if (!comboMap[comboName]) comboMap[comboName] = [];
-        comboMap[comboName].push({
-          code: refCode,
-          name: loyData.loyalistName || "Anonymous",
-          city: loyData.city || "Unknown",
-          supporters: loyData.supporters || 0,
-          comboImg1: loyData.comboImg1 || "",
-          comboImg2: loyData.comboImg2 || ""
-        });
-      });
-
-      const medalIcons = ["🥇", "🥈", "🥉"];
-      let foundAny = false;
-
-      Object.keys(comboMap).forEach(comboName => {
-        const arr = comboMap[comboName];
-        if (!arr || !arr.length) return;
-
-        foundAny = true;
-        arr.sort((a,b) => b.supporters - a.supporters);
-        const { comboImg1, comboImg2 } = arr[0];
-
-        const comboWrapper = document.createElement('div');
-        comboWrapper.className = 'loyalist-combo-wrap';
-
-        const comboTitle = document.createElement('h4');
-        comboTitle.className = 'loyalist-combo-title';
-        comboTitle.textContent = comboName;
-        comboWrapper.appendChild(comboTitle);
-
-        const flexContainer = document.createElement('div');
-        flexContainer.className = 'loyalist-flex';
-
-        const imagesCol = document.createElement('div');
-        imagesCol.className = 'loyalist-images-col';
-
-        const img1 = document.createElement('img');
-        img1.className = 'loyalist-square-img';
-        img1.src = comboImg1 || 'https://placehold.co/50x50';
-        img1.onerror = () => { img1.src = 'https://placehold.co/50x50'; };
-
-        const img2 = document.createElement('img');
-        img2.className = 'loyalist-square-img';
-        img2.src = comboImg2 || 'https://placehold.co/50x50';
-        img2.onerror = () => { img2.src = 'https://placehold.co/50x50'; };
-
-        imagesCol.appendChild(img1);
-        imagesCol.appendChild(img2);
-
-        const influencersCol = document.createElement('div');
-        influencersCol.className = 'loyalist-influencers-col';
-
-        arr.forEach((loy, index) => {
-          const icon = medalIcons[index] || '⭐';
-          const row = document.createElement('div');
-          row.className = 'loyalist-row';
-
-          const textLine = document.createElement('div');
-          textLine.className = 'loyalist-info';
-          textLine.innerHTML = `
-            ${icon} <strong>${loy.name}</strong> from <em>${loy.city}</em>
-            influenced <strong>${Number(loy.supporters || 0).toLocaleString()}</strong> supporters
-            to vote <em>${comboName}</em>.
-          `;
-
-          row.appendChild(textLine);
-          influencersCol.appendChild(row);
-        });
-
-        flexContainer.appendChild(imagesCol);
-        flexContainer.appendChild(influencersCol);
-        comboWrapper.appendChild(flexContainer);
-        loyalistCombosEl.appendChild(comboWrapper);
-      });
-
-      if (!foundAny) loyalistCombosEl.innerHTML = "<p>No loyalist data available for any combo yet.</p>";
-    }
-
-    /********************************************
-     * COMMENTS
-     ********************************************/
-    function renderComboComments() {
-      if (!currentCombo) return;
-      comboCommentListEl.innerHTML = '';
-
-      const commentsForCombo = comboComments[currentCombo] || [];
-      if (!commentsForCombo.length) {
-        comboCommentListEl.innerHTML = '<p>Be the first to comment on this combo!</p>';
-        return;
-      }
-
-      commentsForCombo.forEach(comment => {
-        if (!comment.parentID || comment.parentID === 0) comboCommentListEl.appendChild(createCommentElement(comment));
-      });
-    }
-
-    function createCommentElement(commentData) {
-      const wrap = document.createElement('div');
-      wrap.className = 'combo-comment-item';
-      wrap.dataset.commentId = commentData.id;
-
-      const authorDiv = document.createElement('div');
-      authorDiv.className = 'comment-author';
-      authorDiv.textContent = commentData.name || "Anonymous";
-
-      const textDiv = document.createElement('div');
-      textDiv.className = 'comment-text';
-      textDiv.textContent = commentData.text || "(No comment)";
-
-      const actionsDiv = document.createElement('div');
-      actionsDiv.className = 'comment-actions';
-      actionsDiv.textContent = 'Reply';
-      actionsDiv.style.cursor = 'pointer';
-
-      const replyFormDiv = document.createElement('div');
-      replyFormDiv.className = 'reply-form';
-
-      const replyNameInput = document.createElement('input');
-      replyNameInput.className = 'reply-input';
-      replyNameInput.type = 'text';
-      replyNameInput.placeholder = 'Your Name';
-
-      const replyTextInput = document.createElement('textarea');
-      replyTextInput.className = 'reply-textarea';
-      replyTextInput.rows = 2;
-      replyTextInput.placeholder = 'Your reply...';
-
-      const replyBtn = document.createElement('button');
-      replyBtn.className = 'reply-btn';
-      replyBtn.textContent = 'Post Reply';
-
-      actionsDiv.addEventListener('click', () => {
-        replyFormDiv.style.display = (replyFormDiv.style.display === 'flex') ? 'none' : 'flex';
-      });
-
-      replyBtn.addEventListener('click', async () => {
-        const replyName = replyNameInput.value.trim();
-        const replyText = replyTextInput.value.trim();
-        if (!replyName || !replyText) { alert("Please enter name and reply."); return; }
-
-        replyBtn.disabled = true;
-        const old = replyBtn.textContent;
-        replyBtn.textContent = "Posting...";
-
-        const r = await apiPost("addComment", {
-          parentID: commentData.id,
-          name: replyName,
-          text: replyText,
-          comboKey: commentData.comboKey
-        });
-
-        if (!r || !r.ok) {
-          alert("Reply failed: " + (r && r.error ? r.error : "Unknown"));
-        } else {
-          await loadFromBackend();
-          renderComboComments();
-          renderComboGrid();
-        }
-
-        replyBtn.disabled = false;
-        replyBtn.textContent = old;
-        replyNameInput.value = "";
-        replyTextInput.value = "";
-        replyFormDiv.style.display = "none";
-      });
-
-      replyFormDiv.appendChild(replyNameInput);
-      replyFormDiv.appendChild(replyTextInput);
-      replyFormDiv.appendChild(replyBtn);
-
-      wrap.appendChild(authorDiv);
-      wrap.appendChild(textDiv);
-      wrap.appendChild(actionsDiv);
-      wrap.appendChild(replyFormDiv);
-
-      if (commentData.replies && commentData.replies.length) {
-        const repliesContainer = document.createElement('div');
-        repliesContainer.className = 'comment-replies';
-        commentData.replies.forEach(reply => repliesContainer.appendChild(createCommentElement(reply)));
-        wrap.appendChild(repliesContainer);
-      }
-
-      return wrap;
-    }
-
-    comboCommentPostBtn.addEventListener('click', async () => {
-      if (!currentCombo) { alert("No combo selected..."); return; }
-      const name = comboCommentName.value.trim();
-      const text = comboCommentText.value.trim();
-      if (!name || !text) { alert("Please enter name and comment."); return; }
-
-      comboCommentPostBtn.disabled = true;
-      const old = comboCommentPostBtn.textContent;
-      comboCommentPostBtn.textContent = "Posting...";
-
-      const r = await apiPost("addComment", { parentID: 0, name, text, comboKey: currentCombo });
-
-      if (!r || !r.ok) {
-        alert("Comment failed: " + (r && r.error ? r.error : "Unknown"));
-      } else {
-        comboCommentName.value = "";
-        comboCommentText.value = "";
-        await loadFromBackend();
-        renderComboComments();
-        renderComboGrid();
-      }
-
-      comboCommentPostBtn.disabled = false;
-      comboCommentPostBtn.textContent = old;
-    });
-
-    function openComboComments(comboKey) {
-      currentCombo = comboKey;
-      const section = document.getElementById('commentsSection');
-      section.classList.add('active');
-      comboCommentTitle.textContent = `Comments for: ${comboKey}`;
-      renderComboComments();
-      section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-
-    /********************************************
-     * CONTACT FORM -> GOOGLE SHEETS
-     ********************************************/
-    lightboxSubmitMsg.style.display = "none";
-
-    lightboxForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-
-      const fn = contactFullNameEl.value.trim();
-      const ph = contactPhoneEl.value.trim();
-      const em = contactEmailEl.value.trim();
-      const msg = contactMessageEl.value.trim();
-
-      if (!fn || ph.length !== 11 || !ph.startsWith('0') || !em.includes('@') || !em.includes('.')) {
-        alert("Please fill out all contact form fields correctly!");
-        return;
-      }
-
-      lightboxForm.querySelector('button[type="submit"]').disabled = true;
-
-      const r = await apiPost("submitContact", {
-        fullName: fn,
-        phone: ph,
-        email: em,
-        message: msg
-      });
-
-      lightboxForm.querySelector('button[type="submit"]').disabled = false;
-
-      if (!r || !r.ok) {
-        alert("Submission failed: " + (r && r.error ? r.error : "Unknown"));
-        return;
-      }
-
-      lightboxSubmitMsg.style.display = 'block';
-      lightboxForm.style.display = 'none';
-
-      setTimeout(() => {
-        lightboxOverlay.style.display = 'none';
-        lightboxSubmitMsg.style.display = 'none';
-        lightboxForm.style.display = 'flex';
-        contactFullNameEl.value = '';
-        contactPhoneEl.value = '';
-        contactEmailEl.value = '';
-        contactMessageEl.value = '';
-      }, 2000);
-    });
-
-    /********************************************
-     * REFERRAL REQUEST -> GOOGLE SHEETS
-     ********************************************/
-    referralSubmitMsg.style.display = "none";
-
-    referralRequestForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const name = referralNameEl.value.trim();
-      const contact = referralContactEl.value.trim();
-      if (!name || !contact) { alert("Please enter your name and phone/email."); return; }
-
-      const btn = referralRequestForm.querySelector('button[type="submit"]');
-      btn.disabled = true;
-      btn.textContent = "Submitting...";
-
-      const r = await apiPost("requestReferralCode", { name, contact });
-
-      btn.disabled = false;
-      btn.textContent = "Request Code";
-
-      if (!r || !r.ok) {
-        alert("Request failed: " + (r && r.error ? r.error : "Unknown"));
-        return;
-      }
-
-      referralSubmitMsg.style.display = "block";
-      referralRequestForm.style.display = "none";
-      referralNameEl.value = "";
-      referralContactEl.value = "";
-    });
-
-    /********************************************
-     * MAP
-     ********************************************/
-    function initMap() {
-      am5.ready(function() {
-        try {
-          let root = am5.Root.new("nigeriaMap");
-          root.setThemes([am5themes_Animated.new(root)]);
-
-          mapChart = root.container.children.push(
-            am5map.MapChart.new(root, {
-              panX: "rotateX",
-              panY: "none",
-              wheelX: "zoom",
-              wheelY: "none",
-              projection: am5map.geoMercator(),
-              maxZoomLevel: 4,
-              minZoomLevel: 0.8
-            })
-          );
-
-          polygonSeries = mapChart.series.push(
-            am5map.MapPolygonSeries.new(root, {
-              geoJSON: am5geodata_nigeriaLow,
-              valueField: "value",
-              calculateAggregates: true
-            })
-          );
-
-          polygonSeries.set("heatRules", [{
-            target: polygonSeries.mapPolygons.template,
-            min: am5.color(0xccffcc),
-            max: am5.color(0x006400),
-            dataField: "value",
-            key: "fill",
-            logarithmic: true
-          }]);
-
-          polygonSeries.mapPolygons.template.setAll({
-            interactive: true,
-            tooltipHTML: `<div style="min-width:150px; font-family:'Montserrat',sans-serif;">{tooltipHTML}</div>`,
-            templateField: "polygonSettings"
-          });
-
-          polygonSeries.mapPolygons.template.states.create("hover", { fill: am5.color(0xffa500) });
-          mapChart.set("zoomControl", am5map.ZoomControl.new(root, {}));
-
-          renderMap();
-        } catch (e) {
-          console.error("Error initializing map:", e);
-          document.getElementById("nigeriaMap").innerHTML = "<p style='color:red; text-align:center; padding: 20px;'>Error loading map. Please refresh.</p>";
-        }
-      });
-    }
-
-    function renderMap() {
-      if (!polygonSeries) return;
-
-      const stateIdMap = {
-        "Abia": "NG-AB", "Adamawa": "NG-AD", "Akwa Ibom": "NG-AK", "Anambra": "NG-AN", "Bauchi": "NG-BA", "Bayelsa": "NG-BY", "Benue": "NG-BE", "Borno": "NG-BO",
-        "Cross River": "NG-CR", "Delta": "NG-DE", "Ebonyi": "NG-EB", "Edo": "NG-ED", "Ekiti": "NG-EK", "Enugu": "NG-EN", "FCT Abuja": "NG-FC", "Gombe": "NG-GO",
-        "Imo": "NG-IM", "Jigawa": "NG-JI", "Kaduna": "NG-KD", "Kano": "NG-KN", "Katsina": "NG-KT", "Kebbi": "NG-KE", "Kogi": "NG-KO", "Kwara": "NG-KW",
-        "Lagos": "NG-LA", "Nasarawa": "NG-NA", "Niger": "NG-NI", "Ogun": "NG-OG", "Ondo": "NG-ON", "Osun": "NG-OS", "Oyo": "NG-OY", "Plateau": "NG-PL",
-        "Rivers": "NG-RI", "Sokoto": "NG-SO", "Taraba": "NG-TA", "Yobe": "NG-YO", "Zamfara": "NG-ZA"
-      };
-
-      const mapDataForSeries = [];
-
-      Object.entries(stateIdMap).forEach(([stateName, geoId]) => {
-        const info = mapStatesTop[stateName];
-        let tooltipContent = `<strong>${stateName}</strong><br>No voting data available`;
-        let voteCount = 0;
-
-        if (info && info.combo && info.combo !== "N/A") {
-          voteCount = Number(info.count || 0);
-          const [presName, vpName] = String(info.combo).split(" & ");
-          const imgPresSrc = candidateImages[presName] || 'https://placehold.co/35x35/cccccc/ffffff?text=P';
-          const imgVPSrc = candidateImages[vpName] || 'https://placehold.co/35x35/cccccc/ffffff?text=V';
-
-          tooltipContent = `
-            <div style="font-size:0.85rem; text-align:center;">
-              <strong>${stateName}</strong><hr style="margin:3px 0;">
-              Top Combo:<br><em>${info.combo}</em><br>
-              Votes: <strong>${formatNumber(voteCount)}</strong>
-              <div style="margin-top:5px; display:flex; justify-content:center; gap:5px;">
-                <img src="${imgPresSrc}" style="width:35px;height:35px;border-radius:50%;object-fit:cover;border:1px solid #ccc;" onerror="this.onerror=null;this.src='https://placehold.co/35x35/cccccc/ffffff?text=P';">
-                <img src="${imgVPSrc}" style="width:35px;height:35px;border-radius:50%;object-fit:cover;border:1px solid #ccc;" onerror="this.onerror=null;this.src='https://placehold.co/35x35/cccccc/ffffff?text=V';">
-              </div>
-            </div>
-          `;
-        }
-
-        mapDataForSeries.push({
-          id: geoId,
-          name: stateName,
-          value: voteCount,
-          tooltipHTML: tooltipContent
-        });
-      });
-
-      polygonSeries.data.setAll(mapDataForSeries);
-    }
-
-    /********************************************
-     * PIE CHART
-     ********************************************/
-    function renderPieChart() {
-      if (pieRoot) { pieRoot.dispose(); pieRoot = null; }
-
-      const pieDiv = document.getElementById("popularityPie");
-      const chartData = Object.entries(votesData)
-        .map(([combo, votes]) => ({ combo, votes }))
-        .filter(x => x.votes > 0)
-        .sort((a,b) => b.votes - a.votes);
-
-      if (!chartData.length) {
-        pieDiv.innerHTML = "<p style='text-align:center; padding: 20px;'>No votes yet to display popularity.</p>";
-        return;
-      }
-
-      pieDiv.innerHTML = "";
-
-      am5.ready(function() {
-        try {
-          pieRoot = am5.Root.new("popularityPie");
-          pieRoot.setThemes([am5themes_Animated.new(pieRoot)]);
-
-          const container = pieRoot.container.children.push(
-            am5.Container.new(pieRoot, {
-              width: am5.percent(100),
-              height: am5.percent(100),
-              layout: pieRoot.verticalLayout
-            })
-          );
-
-          const pieChart = container.children.push(
-            am5percent.PieChart.new(pieRoot, { layout: pieRoot.verticalLayout })
-          );
-
-          const series = pieChart.series.push(
-            am5percent.PieSeries.new(pieRoot, {
-              valueField: "votes",
-              categoryField: "combo",
-              alignLabels: true,
-              radius: am5.percent(85)
-            })
-          );
-
-          series.data.setAll(chartData);
-
-          series.labels.template.setAll({
-            radius: 10,
-            text: "{category}: {valuePercentTotal.formatNumber('0.0')}%",
-            fontSize: "0.75em",
-            fill: am5.color(0x333333),
-            oversizedBehavior: "truncate",
-            maxWidth: 110,
-            populateText: true
-          });
-
-          series.labels.template.adapters.add("hidden", function(hidden, target) {
-            return target.dataItem.get("valuePercentTotal") < 3;
-          });
-
-          series.ticks.template.setAll({
-            strokeOpacity: 0.4,
-            stroke: am5.color(0x666666),
-            length: 10,
-            visible: true
-          });
-
-          series.ticks.template.adapters.add("hidden", function(hidden, target) {
-            return target.dataItem.get("valuePercentTotal") < 3;
-          });
-
-          series.slices.template.setAll({
-            tooltipText: "{category}: {value} votes ({valuePercentTotal.formatNumber('0.0')}%)",
-            stroke: am5.color(0xffffff),
-            strokeWidth: 1,
-          });
-
-          series.slices.template.states.create("hover", { scale: 1.03 });
-
-          const legend = container.children.push(
-            am5.Legend.new(pieRoot, {
-              centerX: am5.percent(50),
-              x: am5.percent(50),
-              marginTop: 15,
-              marginBottom: 15,
-              layout: pieRoot.horizontalLayout,
-              width: am5.percent(95),
-              wrap: true
-            })
-          );
-
-          legend.data.setAll(series.dataItems);
-          series.appear(1000, 100);
-        } catch (e) {
-          console.error("Pie error:", e);
-          pieDiv.innerHTML = "<p style='color:red; text-align:center; padding: 20px;'>Error loading popularity chart.</p>";
-        }
-      });
-    }
-
-    /********************************************
-     * INIT
-     ********************************************/
-    document.addEventListener('DOMContentLoaded', async () => {
+      // If browser blocks reading (CORS), res may still exist but unreadable; we still treat as "sent".
+      // We'll attempt to parse if possible.
+      let out = null;
+      try { out = await res.json(); } catch(e) {}
+
+      setStatus(`Saved to Sheets (attempted). Event: ${payload.meta.event_id}`, true);
+      bumpLast(payload.meta.event_id);
+      return { ok: true, event_id: payload.meta.event_id, response: out };
+
+    } catch (err) {
+      // Fallback: no-cors (opaque response but usually delivers)
       try {
-        await loadFromBackend();
-      } catch (e) {
-        console.error(e);
-        alert("Failed to load backend data. Check GAS_URL and deployment permissions.");
+        await fetch(APPS_SCRIPT_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(payload)
+        });
+
+        setStatus(`Sent (no-cors). Event: ${payload.meta.event_id}`, true);
+        bumpLast(payload.meta.event_id);
+        return { ok: true, event_id: payload.meta.event_id, noCors: true };
+
+      } catch (err2) {
+        queueEvent(payload);
+        setStatus(`Failed. Queued event: ${payload.meta.event_id}`, false);
+        bumpLast(payload.meta.event_id);
+        return { queued: true, event_id: payload.meta.event_id, error: String(err2) };
       }
+    }
+  }
+
+  function normalizeRecords(data) {
+    if (Array.isArray(data)) return data.map(x => (typeof x === "object" && x !== null) ? x : { value: String(x) });
+    if (typeof data === "object" && data !== null) return [data];
+    return [{ value: String(data) }];
+  }
+
+  function bumpLast(eventId) {
+    const k = getKpi();
+    k.last = eventId;
+    setKpi(k);
+  }
+
+  /* -------------------- FLUSH OFFLINE QUEUE -------------------- */
+
+  async function flushQueue() {
+    const q = getQueue();
+    if (!q.length) {
+      setStatus("No queued events.", true);
+      return;
+    }
+    if (!isOnline()) {
+      setStatus("Still offline. Can't flush.", false);
+      return;
+    }
+
+    setStatus(`Flushing ${q.length} queued event(s)...`, true);
+
+    const remaining = [];
+    for (let i = 0; i < q.length; i++) {
+      const payload = q[i];
+      try {
+        await fetch(APPS_SCRIPT_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(payload)
+        });
+      } catch (e) {
+        remaining.push(payload);
+      }
+    }
+
+    setQueue(remaining);
+    setStatus(remaining.length ? `Flush done. Remaining queued: ${remaining.length}` : "Flush done. Queue cleared.", true);
+  }
+
+  window.addEventListener("online", () => flushQueue());
+
+  /* -------------------- EVENTS: VOTE / SPIN / STATE RESULT -------------------- */
+
+  async function saveVote() {
+    const voterName  = document.getElementById("voterName").value.trim();
+    const voterPhone = document.getElementById("voterPhone").value.trim();
+    const state      = document.getElementById("state").value;
+    const candidate  = document.getElementById("candidate").value;
+    const party      = document.getElementById("party").value;
+    const weight     = Number(document.getElementById("weight").value || 1);
+    const note       = document.getElementById("note").value.trim();
+
+    if (!state || !candidate || !party) {
+      setStatus("Please select State, Candidate, and Party.", false);
+      return;
+    }
+
+    const record = {
+      action: "vote",
+      user: {
+        name: voterName,
+        phone: voterPhone
+      },
+      vote: {
+        state,
+        candidate,
+        party,
+        weight
+      },
+      note
+    };
+
+    // Save to sheet "Votes"
+    const r = await sendToSheets("Votes", record);
+
+    // Local KPI
+    const k = getKpi();
+    k.votes = (k.votes || 0) + 1;
+    k.last = r.event_id || k.last;
+    setKpi(k);
+  }
+
+  async function saveSpinRound() {
+    // Example spin logic (replace with your actual wheel logic)
+    const prizes = ["₦200 Airtime", "₦500 Airtime", "₦1000 Airtime", "Try Again", "Mega Bonus"];
+    const win = prizes[Math.floor(Math.random() * prizes.length)];
+
+    const record = {
+      action: "spin_round",
+      round_id: uid("spin"),
+      result: win,
+      note: "Simulated spin round for testing"
+    };
+
+    const r = await sendToSheets("SpinRounds", record);
+
+    const k = getKpi();
+    k.spins = (k.spins || 0) + 1;
+    k.last = r.event_id || k.last;
+    setKpi(k);
+
+    setStatus(`Spin saved. Result: ${win}`, true);
+  }
+
+  async function saveStateResult(state, candidate, votes) {
+    if (!state || !candidate) {
+      setStatus("Pick state + candidate for state result.", false);
+      return;
+    }
+
+    const record = {
+      action: "state_result",
+      state,
+      candidate,
+      votes: Number(votes || 0)
+    };
+
+    const r = await sendToSheets("StateResults", record);
+    setStatus(`State result saved (${state}). Event: ${r.event_id}`, true);
+  }
+
+  /* -------------------- INIT UI -------------------- */
+
+  function fillSelect(id, items, getVal, getLabel) {
+    const sel = document.getElementById(id);
+    items.forEach(it => {
+      const opt = document.createElement("option");
+      opt.value = getVal(it);
+      opt.textContent = getLabel(it);
+      sel.appendChild(opt);
     });
-  </script>
+  }
+
+  function init() {
+    // States
+    const stateSel = document.getElementById("state");
+    const stateSel2 = document.getElementById("state2");
+    STATES.forEach(s => {
+      const o1 = document.createElement("option"); o1.value = s; o1.textContent = s; stateSel.appendChild(o1);
+      const o2 = document.createElement("option"); o2.value = s; o2.textContent = s; stateSel2.appendChild(o2);
+    });
+
+    // Candidates
+    fillSelect("candidate", CANDIDATES, x => x.id, x => x.name);
+    fillSelect("candidate2", CANDIDATES, x => x.id, x => x.name);
+
+    // Parties
+    fillSelect("party", PARTIES, x => x.id, x => `${x.code} — ${x.name}`);
+
+    // Queue + KPI
+    setQueue(getQueue());
+    renderKpi();
+
+    // Buttons
+    document.getElementById("btnVote").addEventListener("click", saveVote);
+    document.getElementById("btnSpin").addEventListener("click", saveSpinRound);
+    document.getElementById("btnFlush").addEventListener("click", flushQueue);
+
+    document.getElementById("btnStateSave").addEventListener("click", () => {
+      const st = document.getElementById("state2").value;
+      const cd = document.getElementById("candidate2").value;
+      const vt = document.getElementById("stateVotes").value;
+      saveStateResult(st, cd, vt);
+    });
+
+    // Optional: log page open
+    sendToSheets("RawEvents", { action: "page_open" }, { queueOnly: false });
+
+    setStatus("Ready. Connected to Sheets.", true);
+  }
+
+  init();
+</script>
+
 </body>
 </html>
